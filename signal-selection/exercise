@@ -1,0 +1,61 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+os.makedirs("plots", exist_ok=True)
+
+
+data = np.load("data/events.npy")
+x = data[:, 0]
+y = data[:, 1]
+
+plt.figure(figsize=(6, 4))
+plt.hist(x, bins=80, alpha=0.8)
+plt.xlabel("x")
+plt.ylabel("Counts")
+plt.title("Histogram of x")
+plt.savefig("plots/hist_x.png", dpi=150)
+plt.close()
+
+plt.figure(figsize=(6, 4))
+plt.hist(y, bins=80, alpha=0.8)
+plt.xlabel("y")
+plt.ylabel("Counts")
+plt.title("Histogram of y")
+plt.savefig("plots/hist_y.png", dpi=150)
+plt.close()
+
+plt.figure(figsize=(6, 6))
+plt.scatter(x, y, s=4, alpha=0.4)
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Scatter plot of events")
+
+a, b = 3, 3
+theta = np.linspace(0, 2*np.pi, 400)
+xc = a * np.cos(theta)
+yc = b * np.sin(theta)
+
+plt.plot(xc, yc, color="red", linewidth=2, label="signal contour")
+plt.legend()
+
+plt.savefig("plots/scatter.png", dpi=150)
+plt.close()
+
+
+def signal_filter(arr, a=3, b=3):
+    x = arr[:, 0]
+    y = arr[:, 1]
+
+    mask = (x**2) / a**2 + (y**2) / b**2 < 1
+    sig = arr[mask]
+
+    mean_x = np.mean(sig[:, 0])
+    std_x  = np.std(sig[:, 0])
+
+    mean_y = np.mean(sig[:, 1])
+    std_y  = np.std(sig[:, 1])
+
+    return (mean_x, std_x), (mean_y, std_y)
+
+print("Signal statistics:", signal_filter(data))
